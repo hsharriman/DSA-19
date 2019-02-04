@@ -61,6 +61,7 @@ public class MyArrayListTest {
         cows.add(4,JAQUAN);
         assertEquals(5,cows.size());
         boolean error = false;
+        //cows.add(6, JAQUAN);
         try {
             cows.add(6,JAQUAN);
         } catch(IndexOutOfBoundsException e) {
