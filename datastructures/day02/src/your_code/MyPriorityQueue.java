@@ -16,13 +16,7 @@ public class MyPriorityQueue {
         boolean itemAdded = false;
         if (queue.isEmpty()) {
             queue.add(item);
-        } else if (queue.size()==1) {
-            if (queue.getFirst() < item) {
-                queue.addFirst(item);
-            } else if (queue.getFirst() >= item) {
-                queue.addLast(item);
-            }
-        } else {
+        }  else {
             for (int i=0; i<queue.size(); i++){
                 int testVal = queue.getFirst();
                 if (testVal > item || itemAdded){
