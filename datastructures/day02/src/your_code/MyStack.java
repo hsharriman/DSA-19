@@ -18,7 +18,7 @@ public class MyStack implements StackADT<Integer> {
 
     @Override
     public void push(Integer e) {
-        if (maxStack.isEmpty() || maxStack.getFirst() < e){
+        if (maxStack.isEmpty() || maxStack.getFirst() <= e){
             maxStack.addFirst(e);
         }
         ll.addFirst(e);
