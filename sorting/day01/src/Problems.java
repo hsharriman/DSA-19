@@ -42,8 +42,52 @@ public class Problems {
      */
     public static double[] runningMedian(int[] inputStream) {
         double[] runningMedian = new double[inputStream.length];
-        // TODO
+        System.out.printf("input %d\n", inputStream.length);
+        PriorityQueue<Integer> postMedian = minPQ();
+        PriorityQueue<Integer> preMedian = maxPQ();
+        int i = 0;
+        while (i < inputStream.length){
+            int val = inputStream[i];
+            //balancing. which PQ? how many vals to move to balance the 2
+            if (postMedian.isEmpty() || val < postMedian.peek()){
+                preMedian.offer(val);
+                swapMinMax(preMedian, postMedian);
+                System.out.printf("add to pre %d\n", i);
+                if (preMedian.size() > postMedian.size()+1){
+                    postMedian.offer(preMedian.poll());
+                }
+            } else if (preMedian.isEmpty() || val >= preMedian.peek()){
+                postMedian.offer(val);
+                swapMinMax(preMedian, postMedian);
+                System.out.printf("did the thing %d\n", i);
+                if (postMedian.size() > preMedian.size()+1){
+                    preMedian.offer(postMedian.poll());
+                }
+            }
+
+            if (preMedian.size() > postMedian.size()){
+                runningMedian[i] = preMedian.peek();
+            } else if (postMedian.size() > preMedian.size()){
+                runningMedian[i] = postMedian.peek();
+            } else {
+                runningMedian[i] = (preMedian.peek() + postMedian.peek()) / 2.0;
+            }
+            i++;
+        }
+        System.out.println(i);
+        System.out.println(preMedian.size());
+        System.out.println(postMedian.size());
         return runningMedian;
     }
+    private static void swapMinMax(PriorityQueue<Integer> pre, PriorityQueue<Integer> post){
+        if (!pre.isEmpty() && !post.isEmpty()){
+            if (pre.peek() > post.peek()){
+                int temp = pre.poll();
+                pre.offer(post.poll());
+                post.offer(temp);
+                System.out.printf("pre %d post %d\n", pre.peek(), post.peek());
+            }
+        }
 
+    }
 }
