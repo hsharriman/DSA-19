@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.List;
 
 public class BinarySearchTree<T extends Comparable<T>> {
@@ -27,9 +28,22 @@ public class BinarySearchTree<T extends Comparable<T>> {
             add(k);
     }
 
+    private void traverse(List<T> res, TreeNode<T> t){
+        if (t.leftChild != null) {  //visit left child
+            traverse(res, t.leftChild);
+        }
+        res.add(t.key); //check off
+        if (t.rightChild != null){  //visit right child
+            traverse(res, t.rightChild);
+        }
+    }
+
     public List<T> inOrderTraversal() {
-        // TODO
-        return null;
+        List<T> res = new ArrayList<T>();
+        if (root != null){
+            traverse(res, root);
+        }
+        return res;
     }
 
     /**
@@ -66,8 +80,10 @@ public class BinarySearchTree<T extends Comparable<T>> {
             replacement = (n.hasRightChild()) ? n.rightChild : n.leftChild; // replacement is the non-null child
         else {
             // Case 3: two children
-            // TODO
-            replacement = null;
+            replacement = n.leftChild; //choose replacement child
+            delete(replacement);    //delete the copy that arises
+            replacement.moveChildrenFrom(n);    //move the children of the replacement up the tree
+
         }
 
         // Put the replacement in its correct place, and set the parent.
@@ -102,13 +118,45 @@ public class BinarySearchTree<T extends Comparable<T>> {
     }
 
     private TreeNode<T> findPredecessor(TreeNode<T> n) {
-        // TODO
-        return null;
+        TreeNode<T> prev = n;
+        if (n.hasLeftChild()){  //find max value of left subtree
+            prev = n.leftChild;
+            while (prev.hasRightChild()){
+                prev = prev.rightChild;
+            }
+        } else {    //start from root, find prev
+            prev = null;
+            TreeNode<T> temp = root;
+            while (temp != null){
+                if (temp.key.equals(n.key)){
+                    break;
+                } else if (n.key.compareTo(temp.key) > 0){  //temp < n, set prev and move right
+                    prev = temp;
+                    temp = temp.rightChild;
+                } else if (n.key.compareTo(temp.key) < 0){  //temp > n, move left
+                    temp = temp.leftChild;
+                }
+            }
+        }
+        return prev;
     }
-
+    //runtime is O(lgn) avg, O(n) worst if tree not balanced.
     private TreeNode<T> findSuccessor(TreeNode<T> n) {
-        // TODO
-        return null;
+        TreeNode<T> next = n;
+        if (n.hasRightChild()){ //find min value of right subtree
+            next = n.rightChild;
+            while(next.hasLeftChild()){
+                next = next.leftChild;
+            }
+        } else {    //no right subtree, so move up tree until curr node is a LC
+            next = n.parent;
+            TreeNode<T> nn = n;
+            while (next != null && nn.isRightChild()){
+                nn = next;
+                next = next.parent;
+            }
+        }
+        return next;
     }
 
     /**
