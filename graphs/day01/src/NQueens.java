@@ -36,7 +36,20 @@ public class NQueens {
         }
         return false;
     }
-
+    //Checks the current row
+    public static boolean checkRow(char[][] board, int r){
+        for (int i = 0; i < board.length; i++) {
+            if (board[r][i] == 'Q') return true;
+        }
+        return false;
+    }
+    //Checks the current column
+    public static boolean checkCol(char[][] board, int c){
+        for (int i = 0; i < board.length; i++) {
+            if (board[i][c] == 'Q') return true;
+        }
+        return false;
+    }
 
     /**
      * Creates a deep copy of the input array and returns it
@@ -52,7 +65,29 @@ public class NQueens {
     public static List<char[][]> nQueensSolutions(int n) {
         // TODO
         List<char[][]> answers = new ArrayList<>();
+        char[][] tempBoard = new char[n][n];
+        for (int i=0; i<tempBoard.length; i++){
+            for (int j=0; j<tempBoard[0].length; j++){
+                tempBoard[i][j] = '.';
+            }
+        }
+
+        solve(answers, tempBoard, 0, 0, n);
         return answers;
+    }
+    //O(n^2) to check if a valid position, O(n!) to check all permutations of the board, each branch can have n branches
+    private static void solve(List<char[][]> sols, char[][] board, int r, int c, int numQ){
+        if (numQ == 0){
+            sols.add(copyOf(board));
+        } else{
+            for (int i=0; i < board[0].length; i++){
+                if (!checkCol(board, i) && !checkRow(board, r) && !checkDiagonal(board, r, i)){
+                    board[r][i] = 'Q';
+                    solve(sols, board, r+1, i, numQ-1);
+                    board[r][i] = '.';
+                }
+            }
+        }
     }
 
 }
