@@ -292,7 +292,7 @@ public class RubiksCube {
         }
         return out;
     }
-    
+
     private class CubeComparator implements Comparator<RubiksCube>{
         public int compare(RubiksCube r1, RubiksCube r2){
             if (r1.cost < r2.cost){
