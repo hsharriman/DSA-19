@@ -1,12 +1,14 @@
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-
 // this is our implementation of a rubiks cube. It is your job to use A* or some other search algorithm to write a
 // solve() function
 public class RubiksCube {
 
     private BitSet cube;
+    private ArrayList<Character> rotations = new ArrayList<>();
+    private int cost;
+    private int heur = 1;
 
     // initialize a solved rubiks cube
     public RubiksCube() {
@@ -27,14 +29,79 @@ public class RubiksCube {
     // creates a copy of the rubics cube
     public RubiksCube(RubiksCube r) {
         cube = (BitSet) r.cube.clone();
+        this.rotations.addAll(r.rotations);
+        this.heur = r.heur;
+        cost = r.rotations.size() + this.heur;
     }
 
+    public RubiksCube(RubiksCube r, Character lastRotation) {
+        cube = (BitSet) r.cube.clone();
+        this.rotations.addAll(r.rotations);
+        this.rotations.add(lastRotation);
+        this.heur = this.getHeur();
+        cost = r.rotations.size() + this.heur;
+    }
+
+    private void printCube(BitSet c){
+        System.out.printf("\n[");
+        for (int i = 0; i < 72; i++) {
+            if (c.get(i)){
+                System.out.printf("1");
+            } else {
+                System.out.printf("0");
+            }
+            if ((i+1) % 3 == 0){
+                System.out.printf(", ");
+            }
+        }
+        System.out.printf("]\n");
+    }
+    private int getHeur(){
+        int count = 0;
+        for (int i = 0; i < 24; i++) {
+            BitSet trip = new BitSet(3);
+            if (cube.get(i*3))
+                trip.set(0);
+            if (cube.get(i*3 + 1))
+                trip.set(1);
+            if (cube.get(i*3 + 2))
+                trip.set(2);
+
+            int color = bitsetToInt(trip);
+
+            if (Math.abs(i/4 - color) == 3)
+                count += 2;
+            else if (Math.abs(i/4 - color) == 0)
+                ;
+            else
+                count++;
+        }
+        return count/12;
+    }
+
+    private int getHeur2(){
+        int dist = 0;
+        for (int i = 0; i < 24; i++) {
+//            int temp =
+        }
+        return 0;
+    }
     // return true if this rubik's cube is equal to the other rubik's cube
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof RubiksCube))
             return false;
         RubiksCube other = (RubiksCube) obj;
+        if (other.cube.equals(cube)){
+            System.out.println("this cube:");
+            printCube(other.cube);
+            System.out.println("correct cube:");
+            printCube(cube);
+        }
+//        System.out.println("this cube:");
+//        printCube(other.cube);
+//        System.out.println("correct cube:");
+//        printCube(cube);
         return other.cube.equals(cube);
     }
 
@@ -53,6 +120,14 @@ public class RubiksCube {
     }
 
     public boolean isSolved() {
+//        System.out.printf("\ncorrect solution: ");
+//        System.out.println(new RubiksCube().cube.toString());
+//        System.out.printf("\nproposed solution: ");
+////        for (int i = 0; i < this.cube.length(); i++) {
+////            System.out.printf("%d, ", this.cube.get(i));
+////        }
+////        System.out.printf("]\n");
+//        System.out.println(this.cube.toString());
         return this.equals(new RubiksCube());
     }
 
@@ -131,7 +206,7 @@ public class RubiksCube {
                 sidesTo = new int[]{8, 11, 14, 15, 23, 20, 3, 2};
                 break;
             default:
-                System.out.println(c);
+//                System.out.println(c);
                 assert false;
         }
         // if performing a counter-clockwise rotation, swap from and to
@@ -145,9 +220,19 @@ public class RubiksCube {
             sidesTo = temp;
         }
         RubiksCube res = new RubiksCube(cube);
+        res.rotations = this.rotations;
         for (int i = 0; i < faceFrom.length; i++) res.setColor(faceTo[i], this.getColor(faceFrom[i]));
         for (int i = 0; i < sidesFrom.length; i++) res.setColor(sidesTo[i], this.getColor(sidesFrom[i]));
         return res;
+    }
+
+    public List<RubiksCube> getNeighbors() {
+        char[] rotations = {'u', 'U', 'r', 'R', 'f', 'F'};
+        LinkedList<RubiksCube> neighbors = new LinkedList<>();
+        for (char c : rotations) {
+            neighbors.add(new RubiksCube(this.rotate(c), c));
+        }
+        return neighbors;
     }
 
     // returns a random scrambled rubik's cube by applying random rotations
@@ -187,11 +272,71 @@ public class RubiksCube {
         return listTurns;
     }
 
+    void printRotations(){
+        System.out.print("\n[ ");
+        for (int i = 0; i < rotations.size(); i++) {
+            System.out.printf("%s, ", (char)rotations.get(i));
+        }
+        System.out.print("]\n");
+    }
 
     // return the list of rotations needed to solve a rubik's cube
     public List<Character> solve() {
-        // TODO
-        return new ArrayList<>();
+        ArrayList<Character> out = null;
+
+        HashSet<BitSet> visited = new HashSet<>();
+        visited.add(this.cube);
+
+        PriorityQueue<RubiksCube> queue = new PriorityQueue<>(1, new CubeComparator());
+        queue.offer(new RubiksCube(this));
+
+        while (!queue.isEmpty()){
+            RubiksCube curr = queue.poll();
+//            curr.printRotations();
+            if (curr.isSolved()){
+//                System.out.println("solved: ");
+                curr.printRotations();
+                out = curr.rotations;
+                return out;
+            }
+
+            for (RubiksCube r : curr.getNeighbors()){
+                if (!visited.contains(r.cube)){
+                    visited.add(r.cube);
+                    queue.offer(r);
+                }
+            }
+
+        }
+        return out;
+    }
+
+//    private class State {
+//        RubiksCube cube;
+//        private int heur = 1;
+//        private int cost = 1;
+//        ArrayList<Character> rotations = new ArrayList<>();
+//
+//        public State (RubiksCube r, int heuristic, State lastState){
+//            this.cube = r;
+//            this.heur = heuristic;
+//            this.cost = this.heur;
+//
+//            if (lastState != null){
+//                this.cost += lastState.rotations.size();
+//                System.arraycopy(lastState.rotations, 0, 0, this.rotations, 0);
+//            }
+//        }
+//    }
+    private class CubeComparator implements Comparator<RubiksCube>{
+        public int compare(RubiksCube r1, RubiksCube r2){
+            if (r1.cost < r2.cost){
+                return -1;
+            } else if (r1.cost > r2.cost){
+                return 1;
+            }
+            return 0;
+        }
     }
 
 }

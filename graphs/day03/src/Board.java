@@ -1,4 +1,6 @@
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -9,23 +11,23 @@ public class Board {
 
     private int n;
     public int[][] tiles;
-    int dist = 1;
+    int dist;
     int x;
     int y;
 
     // Create a 2D array representing the solved board state
-    private int[][] goal = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+    //private int[][] goal = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
 
     /*
      * Set the global board size and tile state
      */
     public Board(int[][] b) {
-        tiles = b;
-        n = b.length;
+        this.tiles = b;
+        this.n = b.length;
         int[] temp = findEmpty();
-        x = temp[0];
-        y = temp[1];
-        dist = manhattan();
+        this.x = temp[0];
+        this.y = temp[1];
+        this.dist = manhattan();
     }
 
     public Board(int[][] b, int newx, int newy, int newdist){
@@ -37,7 +39,7 @@ public class Board {
 
     }
     /*
-     * Size of the board 
+     * Size of the board
      (equal to 3 for 8 puzzle, 4 for 15 puzzle, 5 for 24 puzzle, etc)
      */
     private int size() {
@@ -58,10 +60,17 @@ public class Board {
     }
 
     private int manhattanhelp(int[][] board, int i, int j){
-        int val = board[i][j];
+        int val = this.tiles[i][j];
         int desiredRow = (val-1)/3;
         int desiredCol = (val-1)%3;
-        return Math.abs(i-desiredRow) + Math.abs(j - desiredCol);
+        if(val < 9) {
+            //System.out.println("i=" + i + " j=" + j + " val=" + val);
+            //System.out.println("h=" + (Math.abs(i-desiredRow) + Math.abs(j - desiredCol)));
+            return Math.abs(i-desiredRow) + Math.abs(j - desiredCol);
+        }
+
+        else
+            return 0;
 
     }
     /*
@@ -71,7 +80,7 @@ public class Board {
         int dist = 0;
         for (int i = 0; i < n; i++) {
             for (int j=0; j<n; j++){
-                dist += manhattanhelp(tiles, i, j);
+                dist += manhattanhelp(this.tiles, i, j);
             }
         }
         return dist;
@@ -103,9 +112,10 @@ public class Board {
             int j = i-1;
 
             while (j>=0 && b[j] > key){
+                if (b[j] != 9 && key != 9)
+                    inversions++;
                 b[j+1] = b[j];
                 j--;
-                inversions++;
             }
             b[j+1] = key;
         }
@@ -136,7 +146,7 @@ public class Board {
         out[x][y] = tiles[x1][y1];
         out[x1][y1] = 9;
         newdist += manhattanhelp(out, x, y) + manhattanhelp(out, x1, y1);
-        return new Board(out, x1, y1, newdist);
+        return new Board(out);
 
     }
     /*
@@ -152,6 +162,12 @@ public class Board {
         return boards;
     }
 
+    public void printBoard() {
+        for (int i = 0; i < n; i++) {
+            System.out.println(Arrays.toString(tiles[i]));
+        }
+        System.out.println("--------------");
+    }
     /*
      * Check if this board equals a given board state
      */
@@ -177,11 +193,11 @@ public class Board {
         return true;
     }
 
+    /*
     public static void main(String[] args) {
         // DEBUG - Your solution can include whatever output you find useful
-        int[][] initState = {{1, 2, 3}, {4, 0, 6}, {7, 8, 5}};
+        int[][] initState = {{1, 2, 3}, {4, 9, 6}, {7, 8, 5}};
         Board board = new Board(initState);
-
         System.out.println("Size: " + board.size());
         System.out.println("Solvable: " + board.solvable());
         System.out.println("Manhattan: " + board.manhattan());
@@ -189,4 +205,5 @@ public class Board {
         System.out.println("Neighbors:");
         Iterable<Board> it = board.neighbors();
     }
+    */
 }
