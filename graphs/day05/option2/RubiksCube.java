@@ -92,16 +92,6 @@ public class RubiksCube {
         if (!(obj instanceof RubiksCube))
             return false;
         RubiksCube other = (RubiksCube) obj;
-        if (other.cube.equals(cube)){
-            System.out.println("this cube:");
-            printCube(other.cube);
-            System.out.println("correct cube:");
-            printCube(cube);
-        }
-//        System.out.println("this cube:");
-//        printCube(other.cube);
-//        System.out.println("correct cube:");
-//        printCube(cube);
         return other.cube.equals(cube);
     }
 
@@ -120,14 +110,6 @@ public class RubiksCube {
     }
 
     public boolean isSolved() {
-//        System.out.printf("\ncorrect solution: ");
-//        System.out.println(new RubiksCube().cube.toString());
-//        System.out.printf("\nproposed solution: ");
-////        for (int i = 0; i < this.cube.length(); i++) {
-////            System.out.printf("%d, ", this.cube.get(i));
-////        }
-////        System.out.printf("]\n");
-//        System.out.println(this.cube.toString());
         return this.equals(new RubiksCube());
     }
 
@@ -310,24 +292,7 @@ public class RubiksCube {
         }
         return out;
     }
-
-//    private class State {
-//        RubiksCube cube;
-//        private int heur = 1;
-//        private int cost = 1;
-//        ArrayList<Character> rotations = new ArrayList<>();
-//
-//        public State (RubiksCube r, int heuristic, State lastState){
-//            this.cube = r;
-//            this.heur = heuristic;
-//            this.cost = this.heur;
-//
-//            if (lastState != null){
-//                this.cost += lastState.rotations.size();
-//                System.arraycopy(lastState.rotations, 0, 0, this.rotations, 0);
-//            }
-//        }
-//    }
+    
     private class CubeComparator implements Comparator<RubiksCube>{
         public int compare(RubiksCube r1, RubiksCube r2){
             if (r1.cost < r2.cost){
