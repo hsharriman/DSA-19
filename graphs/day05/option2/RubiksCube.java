@@ -22,20 +22,6 @@ public class RubiksCube {
         }
     }
 
-    public void populate_hm(){
-        {0,19,22,}
-
-        distances = new HashMap<>();
-        for(int i = 0; i < 24; i++){
-            HashMap<Integer, Integer> curr_distances = new HashMap<>()
-            for(int j = 0; j < 24;j++){
-
-            }
-        distances.put(i, curr_distances);
-
-        }
-    }
-
     // initialize a rubiks cube with the input bitset
     private RubiksCube(BitSet s) {
         cube = (BitSet) s.clone();
